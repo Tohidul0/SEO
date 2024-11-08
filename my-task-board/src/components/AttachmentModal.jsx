@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { PaperclipIcon } from 'lucide-react';
 import Modal from '../ui/Modal';
-import CustomDropdownMenu from '../ui/DropdownMenu';
+import CustomDropdownMenu from '../ui/CustomDropdownMenu';
 import { api } from '../utils/api';
 
 const AttachmentModal = () => {
@@ -51,12 +51,12 @@ const AttachmentModal = () => {
 
   return (
     <>
-      <CustomDropdownMenu>
+      <CustomDropdownMenu cxc>
         <CustomDropdownMenu.Item
           className="flex items-center space-x-2 cursor-pointer hover:bg-gray-100 px-2 py-1 rounded"
           onClick={() => setIsModalOpen(true)}
         >
-          <PaperclipIcon className="w-5 h-5" />
+          <PaperclipIcon className="w-5 h-5 " />
           <span>Attach File</span>
         </CustomDropdownMenu.Item>
       </CustomDropdownMenu>
