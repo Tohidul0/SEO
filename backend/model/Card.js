@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 
-// Define file schema for better clarity
+
 const fileSchema = new mongoose.Schema({
   filename: { type: String, required: true },
   fileType: { type: String, required: true },
@@ -9,15 +9,15 @@ const fileSchema = new mongoose.Schema({
 
 // Define subcard schema
 const subcardSchema = new mongoose.Schema({
-  SubId: { type: String, required: true }, // Change to String for better flexibility
+  SubId: { type: String, required: true }, 
   Attachment: { type: Number, required: true },
-  files: [fileSchema], // Array of file objects
+  files: [fileSchema], 
 });
 
 // Define card schema
 const cardSchema = new mongoose.Schema({
-  ID: { type: String, required: true }, // Change to String for better flexibility
-  subcard: [subcardSchema], // Array of subcard objects
+  ID: { type: String, required: true }, 
+  subcard: [subcardSchema], 
   createdAt: { type: Date, default: Date.now },
 });
 
