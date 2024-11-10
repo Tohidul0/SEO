@@ -1,7 +1,7 @@
 import React from 'react';
 import Navbar from './components/Navbar'
 import CardContainer from './components/CardContainer';
-import FileUploadModal from './components/FileUpload';
+
 
 
 
@@ -95,7 +95,7 @@ function App() {
       
       <CardContainer data={data} />
     </div>
-    <FileUploadModal></FileUploadModal>
+    
       
     </div>
   )

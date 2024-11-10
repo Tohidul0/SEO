@@ -1,6 +1,6 @@
 // src/components/Card.jsx
 import React, { useEffect, useState } from "react";
-import axios from "axios"; 
+import axios from "axios";
 import { FaRegComments } from "react-icons/fa";
 import { FaCalendarDays } from "react-icons/fa6";
 import { GrDetach } from "react-icons/gr";
@@ -9,61 +9,54 @@ const Card = ({ title, content, subCards, ID }) => {
   const [showModal, setShowModal] = useState(false);
   const [attachments, setAttachments] = useState([]);
   const [selectedFiles, setSelectedFiles] = useState([]);
-  const [currentSubCardId, setCurrentSubCardId] = useState(null); 
-  const[refresh, setRefresh] = useState()
-  // Track current subCard ID for uploading
+  const [currentSubCardId, setCurrentSubCardId] = useState(null);
+  const [refresh, setRefresh] = useState();
   const [fetchdata, setFetchdata] = useState([]);
-  useEffect(() => {
-  
-      const fetchData = async () => {
-        try {
-          const response = await axios.get(`http://localhost:5000/api/cards/${ID}`);
-          setFetchdata(response.data.subcard);
-          console.log(response.data)
-        } catch (err) {
-          //console.log('Failed to fetch data');
-        } 
-      };
 
-      fetchData();
-    
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await axios.get(
+          `http://localhost:5000/api/cards/${ID}`
+        );
+        setFetchdata(response.data.subcard);
+      } catch (err) {
+        console.error("Failed to fetch data");
+      }
+    };
+    fetchData();
   }, [ID, refresh]);
 
-  for(let i=0; i<fetchdata.length; i++){
-    if(fetchdata[i]){
-      const num = parseInt(fetchdata[i].SubId)
-      //console.log(num)
-      subCards[num-1] ={...subCards[num-1], Atchment: fetchdata[i].Attachment}
-      //console.log(subCards[num-1])
-    }
+  // Map attachment data to subCards
+  fetchdata.forEach((item) => {
+    const num = parseInt(item.SubId);
+    subCards[num - 1] = { ...subCards[num - 1], Atchment: item.Attachment };
+  });
 
-  }
-  //console.log(subCards)
- 
   // Toggle modal visibility
   const toggleModal = (subCardId) => {
-    setCurrentSubCardId(subCardId); // Set the subCardId when opening modal
+    setCurrentSubCardId(subCardId);
     setShowModal(!showModal);
   };
 
   // Handle file selection
   const handleFileSelection = (event) => {
-    const files = Array.from(event.target.files);
-    setSelectedFiles(files);
-    const updatedAttachments = files.map((file) => ({
+    const newFiles = Array.from(event.target.files);
+    //console.log(newFiles);
+    setSelectedFiles((prevFiles) => [...prevFiles, ...newFiles]);
+    const updatedAttachments = newFiles.map((file) => ({
       name: file.name,
-      extension: file.name.split('.').pop(),
+      extension: file.name.split(".").pop(),
     }));
+
     setAttachments((prev) => [...prev, ...updatedAttachments]);
   };
 
   // Handle file upload
   const uploadFiles = async () => {
-    console.log(selectedFiles)
     const formData = new FormData();
+    console.log(selectedFiles);
     selectedFiles.forEach((file) => formData.append("files", file));
-    console.log(formData)
-    
 
     try {
       const response = await axios.post(
@@ -71,28 +64,32 @@ const Card = ({ title, content, subCards, ID }) => {
         formData,
         { headers: { "Content-Type": "multipart/form-data" } }
       );
-      
-      setRefresh(response.data)
+
+      setRefresh(response.data);
       setSelectedFiles([]);
-      setAttachments([]) 
+      setAttachments([]);
       toggleModal(); // Close modal after upload
     } catch (error) {
       console.error("Error uploading files:", error);
     }
   };
-   
+
   return (
     <div className="flex-shrink-0 w-100 mx-4">
       <div className="bg-white shadow-lg rounded-lg">
         <div className="p-4">
           <h3 className="text-lg font-medium">{title}</h3>
-         
         </div>
 
-        <div className="overflow-y-auto scroll-smooth w-full h-[500px]" style={{ scrollbarWidth: 'thin', scrollbarColor: '#888 #f1f1f1' }}>
+        <div
+          className="overflow-y-auto scroll-smooth w-full h-[500px]"
+          style={{
+            scrollbarWidth: "thin",
+            scrollbarColor: "rgba(0, 0, 255, 0.5) #f1f1f1",
+          }}
+        >
           <div className="px-4 pb-4">
             {subCards.map((subCard) => (
-
               <div
                 key={subCard.id}
                 className="flex-shrink-0 w-full mx-auto my-2"
@@ -124,28 +121,28 @@ const Card = ({ title, content, subCards, ID }) => {
                   </div>
 
                   <div className="flex justify-around items-center my-3 text-xs">
-                    <div className="flex ">
-                    <img
-                      src={subCard.img1}
-                      alt=""
-                      className="w-4 h-4 rounded-full"
-                    />
-                    <img
-                      src={subCard.img2}
-                      alt=""
-                      className="w-4 h-4 rounded-full"
-                    />
-                    <p className="w-5 h-5 rounded-full">{subCard.plus}</p>
+                    <div className="flex">
+                      <img
+                        src={subCard.img1}
+                        alt=""
+                        className="w-4 h-4 rounded-full"
+                      />
+                      <img
+                        src={subCard.img2}
+                        alt=""
+                        className="w-4 h-4 rounded-full"
+                      />
+                      <p className="w-5 h-5 rounded-full">{subCard.plus}</p>
                     </div>
-                    <div className="flex mx-2   items-center">
-                    <FaRegComments />
-                    <p className="w-5 h-5 rounded-full">{subCard.num}</p>
+                    <div className="flex mx-2 items-center">
+                      <FaRegComments />
+                      <p className="w-5 h-5 rounded-full">{subCard.num}</p>
                     </div>
-                    <div className="flex px-2   items-center">
-                    <button onClick={() => toggleModal(subCard.id)}>
-                      <GrDetach />
-                    </button>
-                    <p>{subCard.Atchment || 0}</p>
+                    <div className="flex px-2 items-center">
+                      <button onClick={() => toggleModal(subCard.id)}>
+                        <GrDetach />
+                      </button>
+                      <p>{subCard.Atchment || 0}</p>
                     </div>
                     <FaCalendarDays />
                     <p className="h-5 rounded-full">{subCard.date}</p>
@@ -185,12 +182,14 @@ const Card = ({ title, content, subCards, ID }) => {
                   <div className="mt-4">
                     <h4 className="font-medium">Uploaded Files:</h4>
                     <ul className="mt-2 text-sm">
-                    {attachments.map((file, index) => (
-                    <li key={index} className="flex justify-between">
-                      <span>{file.name}</span>
-                      <span className="text-gray-500">.{file.extension}</span>
-                    </li>
-                  ))}
+                      {attachments.map((file, index) => (
+                        <li key={index} className="flex justify-between">
+                          <span>{file.name}</span>
+                          <span className="text-gray-500">
+                            .{file.extension}
+                          </span>
+                        </li>
+                      ))}
                     </ul>
                   </div>
                 </div>
