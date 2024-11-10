@@ -32,9 +32,9 @@ const Card = ({ title, content, subCards, ID }) => {
   for(let i=0; i<fetchdata.length; i++){
     if(fetchdata[i]){
       const num = parseInt(fetchdata[i].SubId)
-      console.log(num)
+      //console.log(num)
       subCards[num-1] ={...subCards[num-1], Atchment: fetchdata[i].Attachment}
-      console.log(subCards[num-1])
+      //console.log(subCards[num-1])
     }
 
   }
@@ -50,12 +50,20 @@ const Card = ({ title, content, subCards, ID }) => {
   const handleFileSelection = (event) => {
     const files = Array.from(event.target.files);
     setSelectedFiles(files);
+    const updatedAttachments = files.map((file) => ({
+      name: file.name,
+      extension: file.name.split('.').pop(),
+    }));
+    setAttachments((prev) => [...prev, ...updatedAttachments]);
   };
 
   // Handle file upload
   const uploadFiles = async () => {
+    console.log(selectedFiles)
     const formData = new FormData();
     selectedFiles.forEach((file) => formData.append("files", file));
+    console.log(formData)
+    
 
     try {
       const response = await axios.post(
@@ -63,8 +71,10 @@ const Card = ({ title, content, subCards, ID }) => {
         formData,
         { headers: { "Content-Type": "multipart/form-data" } }
       );
+      
       setRefresh(response.data)
-      setSelectedFiles([]); 
+      setSelectedFiles([]);
+      setAttachments([]) 
       toggleModal(); // Close modal after upload
     } catch (error) {
       console.error("Error uploading files:", error);
@@ -175,14 +185,12 @@ const Card = ({ title, content, subCards, ID }) => {
                   <div className="mt-4">
                     <h4 className="font-medium">Uploaded Files:</h4>
                     <ul className="mt-2 text-sm">
-                      {attachments.map((file, index) => (
-                        <li key={index} className="flex justify-between">
-                          <span>{file.filename}</span>
-                          <span className="text-gray-500">
-                            .{file.fileType.split("/")[1]}
-                          </span>
-                        </li>
-                      ))}
+                    {attachments.map((file, index) => (
+                    <li key={index} className="flex justify-between">
+                      <span>{file.name}</span>
+                      <span className="text-gray-500">.{file.extension}</span>
+                    </li>
+                  ))}
                     </ul>
                   </div>
                 </div>
